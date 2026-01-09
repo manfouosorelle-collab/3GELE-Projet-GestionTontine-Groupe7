@@ -1,0 +1,47 @@
+
+{% extends 'admin_dashboard.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Supprimer un Membre</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow rounded-4">
+                    <div class="card-header bg-danger text-white text-center">
+                        <h4 class="mb-0">Confirmation de suppression</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <p class="fs-5">Êtes-vous sûr de vouloir supprimer le membre suivant ?</p>
+                        <ul class="list-group mb-4 text-start">
+                            <li class="list-group-item"><strong>Nom :</strong> {{ membre.nom }}</li>
+                            <li class="list-group-item"><strong>Prénom :</strong> {{ membre.prenom }}</li>
+                            <li class="list-group-item"><strong>Email :</strong> {{ membre.email }}</li>
+                            <!-- Ajoute d'autres champs si nécessaires -->
+                        </ul>
+
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger me-2">🗑️ Supprimer</button>
+                        </form>
+                        <a href="{% url 'liste_membres' %}" class="btn btn-secondary">↩️ Annuler</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}
+
+
+
+
+
+

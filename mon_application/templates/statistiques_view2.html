@@ -1,0 +1,51 @@
+{% extends 'member_dashboard.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">Statistiques Globales</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Tranches d'âge -->
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <h3 class="text-xl font-semibold mb-4 text-center">Répartition des membres par tranche d'âge</h3>
+            <canvas id="ageChart" width="250" height="250" style="max-width: 300px; max-height: 300px;"></canvas>
+
+        </div>
+
+        <!-- Adhésion aux tontines -->
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col items-center">
+            <h3 class="text-xl font-semibold mb-4 text-center">Taux d'adhésion aux tontines</h3>
+            <canvas id="tontineChart" width="300" height="300" style="max-width: 300px; max-height: 300px;"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ageCtx = document.getElementById('ageChart').getContext('2d');
+new Chart(ageCtx, {
+    type: 'pie',
+    data: {
+        labels: {{ tranche_labels|safe }},
+        datasets: [{
+            label: 'Tranches d\'âge',
+            data: {{ tranche_data|safe }},
+            backgroundColor: ['#60A5FA', '#34D399', '#FBBF24', '#F87171', '#A78BFA']
+        }]
+    }
+});
+
+const tontineCtx = document.getElementById('tontineChart').getContext('2d');
+new Chart(tontineCtx, {
+    type: 'pie',
+    data: {
+        labels: {{ tontine_labels|safe }},
+        datasets: [{
+            label: 'Adhésion Tontines',
+            data: {{ tontine_data|safe }},
+            backgroundColor: ['#4ADE80', '#818CF8', '#F472B6', '#FACC15']
+        }]
+    }
+});
+</script>
+{% endblock %}

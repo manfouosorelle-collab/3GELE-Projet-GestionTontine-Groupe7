@@ -1,0 +1,121 @@
+{% extends 'member_dashboard.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Tontines</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('path/to/your/background-image.jpg'); /* Remplacez par le chemin de votre image de fond */
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.7); /* Couleur de fond semi-transparente */
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #28a745; /* Couleur du bouton de base */
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #218838; /* Couleur du bouton au survol */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff; /* Couleur de l'en-tête */
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.1); /* Couleur pour les lignes paires */
+        }
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Couleur au survol des lignes */
+        }
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+            margin-right: 5px;
+            transition: background-color 0.3s;
+        }
+        .action-btn.souscrire {
+            background-color: #007bff; /* Couleur pour le bouton Souscrire */
+        }
+        .action-btn.souscrire:hover {
+            background-color: #0056b3; /* Couleur au survol */
+        }
+        .action-btn.modifier {
+            background-color: #ffc107; /* Couleur pour le bouton Modifier */
+        }
+        .action-btn.modifier:hover {
+            background-color: #e0a800; /* Couleur au survol */
+        }
+        .action-btn.supprimer {
+            background-color: #dc3545; /* Couleur pour le bouton Supprimer */
+        }
+        .action-btn.supprimer:hover {
+            background-color: #c82333; /* Couleur au survol */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Liste des Tontines</h1>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Montant</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for Tontines in tontines %}
+                <tr>
+                    <td>{{ Tontines.typeTontine }}</td>
+                    <td>{{ Tontines.montant }} F</td>
+                    <td>
+                        <a href="{% url 'voir_membres_tontines' Tontines.idTontines %}" class="action-btn souscrire">Souscrire</a>
+                    </td>
+                    
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">Aucune tontine disponible.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+{% endblock %}

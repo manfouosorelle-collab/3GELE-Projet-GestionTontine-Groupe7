@@ -1,0 +1,45 @@
+{% extends 'admin_dashboard.html' %}
+
+{% block content %}
+<style>
+    h2 {
+        font-size: 24px;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 18px;
+        color: #34495e;
+        margin-bottom: 30px;
+    }
+
+    form {
+        background-color: #ecf0f1;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background-color: #2980b9;
+    }
+</style>
+
+<h2>Souscription à la Tontine: {{ tontine.typeTontine }}</h2>
+<p>Montant: {{ tontine.montant }} F</p>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit">Souscrire</button>
+</form>
+{% endblock %}

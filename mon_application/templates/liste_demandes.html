@@ -1,0 +1,24 @@
+<h2>Liste des Demandes de Prêt</h2>
+<table>
+    <tr>
+        <th>Membre</th>
+        <th>Montant</th>
+        <th>Statut</th>
+        <th>Actions</th>
+    </tr>
+    {% for pret in prets %}
+    <tr>
+        <td>{{ pret.membre.nom }}</td>
+        <td>{{ pret.montant }} €</td>
+        <td>{{ pret.statut }}</td>
+        <td>
+            <a href="{% url 'valider_pret' pret.idpret 'valider' %}">Accorder</a>
+            <a href="{% url 'valider_pret' pret.idpret 'refuser' %}">Refuser</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">Aucune demande de prêt en attente.</td>
+    </tr>
+    {% endfor %}
+</table>

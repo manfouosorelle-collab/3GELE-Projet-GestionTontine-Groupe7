@@ -1,0 +1,267 @@
+{% extends 'admin_dashboard.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm rounded-4">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Soumettre une demande de prêt</h4>
+                </div>
+
+                <div class="card-body">
+                    <!-- Messages d'alerte -->
+                    {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" enctype="multipart/form-data" id="demandePretForm">
+                        {% csrf_token %}
+
+                        <!-- Montant du prêt -->
+                        <div class="mb-3">
+                            <label for="montant" class="form-label fw-bold">
+                                <i class="fas fa-money-bill-wave me-2"></i>Montant du prêt (FCFA)
+                            </label>
+                            <input type="number" step="1000" min="1000" id="montant" name="montant"
+                                   class="form-control" placeholder="Ex: 50000" required>
+                            <div class="form-text">Montant minimum: 1 000 FCFA</div>
+                        </div>
+
+                        <!-- Observations -->
+                        <div class="mb-3">
+                            <label for="observations" class="form-label fw-bold">
+                                <i class="fas fa-comment-dots me-2"></i>Observations / Motif
+                            </label>
+                            <textarea id="observations" name="observations" rows="4"
+                                      class="form-control" placeholder="Décrivez l'utilisation prévue du prêt..."
+                                      required></textarea>
+                            <div class="form-text">Maximum 500 caractères</div>
+                        </div>
+
+                        <!-- Garant -->
+                        <div class="mb-3">
+                            <label for="garant_id" class="form-label fw-bold">
+                                <i class="fas fa-user-shield me-2"></i>Choisir un garant
+                            </label>
+                            <select name="garant_id" id="garant_id" class="form-select" required>
+                                <option value="">-- Sélectionner un membre --</option>
+                                {% for m in membres %}
+                                    <option value="{{ m.idmembre }}">
+                                        {{ m.nom }} {{ m.prenom }}
+                                        {% if m.telephone %} - {{ m.telephone }}{% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Sélectionnez un autre membre comme garant</div>
+                        </div>
+
+                        <!-- Tontine CORRIGÉ : Utilise 'tontines' (minuscule) -->
+                        <div class="mb-3">
+                            <label for="tontine_id" class="form-label fw-bold">
+                                <i class="fas fa-piggy-bank me-2"></i>Choisir une tontine
+                            </label>
+                            <select name="tontine_id" id="tontine_id" class="form-select" required>
+                                <option value="">-- Sélectionner une tontine --</option>
+                                {% for t in tontines %}  <!-- CORRECTION: 't' in 'tontines' -->
+                                    <option value="{{ t.idTontines }}">
+                                        {{ t.get_typeTontine_display }}
+                                        {% if t.montant %} ({{ t.montant }} FCFA){% endif %}
+                                    </option>
+                                {% empty %}
+                                    <option value="" disabled>Aucune tontine disponible</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Sélectionnez la tontine dans laquelle vous souhaitez faire le prêt</div>
+
+                            <!-- Affiche un message si pas de tontines -->
+                            {% if not tontines %}
+                            <div class="alert alert-warning mt-2">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Aucune tontine n'est disponible pour le moment.
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- CNI du garant -->
+                        <div class="mb-4">
+                            <label for="garant_cni_image" class="form-label fw-bold">
+                                <i class="fas fa-id-card me-2"></i>CNI du garant (image)
+                            </label>
+                            <input type="file" name="garant_cni_image" id="garant_cni_image"
+                                   class="form-control" accept="image/*" required
+                                   onchange="previewImage(this)">
+                            <div class="form-text">Formats acceptés: JPG, PNG, PDF. Taille max: 5MB</div>
+
+                            <!-- Aperçu de l'image -->
+                            <div id="imagePreview" class="mt-3 text-center" style="display: none;">
+                                <img id="previewImage" src="#" alt="Aperçu CNI"
+                                     class="img-thumbnail" style="max-height: 200px;">
+                                <button type="button" class="btn btn-sm btn-outline-danger mt-2"
+                                        onclick="removeImage()">
+                                    <i class="fas fa-times me-1"></i>Supprimer
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Boutons -->
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a href="{% url 'liste_prets' %}" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-arrow-left me-2"></i>Retour
+                            </a>
+                            <button type="submit" class="btn btn-success px-5" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i>Soumettre
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript pour améliorations -->
+<script>
+// Aperçu de l'image CNI
+function previewImage(input) {
+    const previewDiv = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImage');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewDiv.style.display = 'block';
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewDiv.style.display = 'none';
+    }
+}
+
+// Supprimer l'image
+function removeImage() {
+    document.getElementById('garant_cni_image').value = '';
+    document.getElementById('imagePreview').style.display = 'none';
+}
+
+// Validation du formulaire
+document.getElementById('demandePretForm').addEventListener('submit', function(e) {
+    const montant = document.getElementById('montant').value;
+    const garant = document.getElementById('garant_id').value;
+    const tontine = document.getElementById('tontine_id').value;
+    const cni = document.getElementById('garant_cni_image').value;
+
+    // Validation montant minimum
+    if (parseInt(montant) < 1000) {
+        e.preventDefault();
+        alert('Le montant minimum est de 1 000 FCFA');
+        return false;
+    }
+
+    // Validation garant
+    if (!garant) {
+        e.preventDefault();
+        alert('Veuillez sélectionner un garant');
+        return false;
+    }
+
+    // Validation tontine
+    if (!tontine) {
+        e.preventDefault();
+        alert('Veuillez sélectionner une tontine');
+        return false;
+    }
+
+    // Validation fichier
+    if (!cni) {
+        e.preventDefault();
+        alert('Veuillez télécharger la CNI du garant');
+        return false;
+    }
+
+    // Désactiver le bouton pour éviter les double-clics
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Traitement en cours...';
+});
+
+// Afficher un compteur de caractères pour les observations
+document.getElementById('observations').addEventListener('input', function() {
+    const maxLength = 500;
+    const currentLength = this.value.length;
+    const charCount = document.getElementById('charCount');
+
+    if (!charCount) {
+        const charCountDiv = document.createElement('div');
+        charCountDiv.id = 'charCount';
+        charCountDiv.className = 'form-text text-end';
+        this.parentNode.appendChild(charCountDiv);
+    }
+
+    document.getElementById('charCount').textContent =
+        `${currentLength}/${maxLength} caractères`;
+
+    if (currentLength > maxLength) {
+        document.getElementById('charCount').className = 'form-text text-danger text-end';
+    } else {
+        document.getElementById('charCount').className = 'form-text text-end';
+    }
+});
+</script>
+
+<!-- Ajout de FontAwesome pour les icônes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Style CSS additionnel -->
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+}
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+    padding: 1.5rem;
+}
+.form-label {
+    font-weight: 600;
+    color: #333;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    font-weight: 600;
+}
+.btn-success:hover {
+    background: linear-gradient(135deg, #218838 0%, #1ba87e 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+#imagePreview img {
+    max-width: 100%;
+    border-radius: 8px;
+}
+</style>
+{% endblock %}
+
+
+
+
+
+
+
+
+

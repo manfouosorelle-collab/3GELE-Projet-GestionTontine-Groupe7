@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #495057;
+        }
+        input[type="email"],
+        input[type="password"],
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+        input:focus,
+        select:focus {
+            border-color: #28a745;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+        .error-message {
+            text-align: center;
+            color: red;
+            margin-top: 10px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Inscription</h1>
+        <form method="post">
+            {% csrf_token %}
+            <label for="email">Email :</label>
+            <input type="email" name="email" required placeholder="Email">
+            
+            <label for="password">Mot de passe :</label>
+            <input type="password" name="password" required placeholder="Mot de passe">
+            
+            <label for="nom">Nom :</label>
+            <input type="text" name="nom" required placeholder="Nom">
+            
+            <label for="prenom">Prénom :</label>
+            <input type="text" name="prenom" required placeholder="Prénom">
+            
+            <label for="anneeEntree">Année d'entrée :</label>
+            <input type="number" name="anneeEntree" required placeholder="Année d'entrée">
+            
+            <label for="anneeNais">Année de naissance :</label>
+            <input type="number" name="anneeNais" required placeholder="Année de naissance">
+            
+            <label for="telephone">Numéro de téléphone :</label>
+            <input type="text" name="telephone" required placeholder="Numéro de téléphone">
+            
+            <label for="actif">Actif :</label>
+            <input type="number" name="actif" required placeholder="Actif (1 ou 0)">
+            
+            <label for="role">Rôle :</label>
+            <select name="role" required>
+                <option value="admin">Admin</option>
+                <option value="membre">Membre</option>
+            </select>
+            
+            <button type="submit">S'inscrire</button>
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="error-message">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>

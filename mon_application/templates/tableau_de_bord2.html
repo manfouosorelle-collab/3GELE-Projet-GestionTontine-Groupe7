@@ -1,0 +1,199 @@
+{% extends 'member_dashboard.html' %}
+
+{% block content %}
+<style>
+    h1 {
+        text-align: center;
+        color: #004080;
+        margin-bottom: 30px;
+    }
+    h2 {
+        margin-top: 40px;
+        color: #333;
+        border-bottom: 2px solid #004080;
+        padding-bottom: 5px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        background-color: white;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background-color: #004080;
+        color: white;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    tr:hover {
+        background-color: #e3f2fd;
+    }
+    a.button {
+        display: inline-block;
+        margin: 25px auto 0;
+        padding: 12px 30px;
+        background-color: #004080;
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+        text-align: center;
+    }
+    a.button:hover {
+        background-color: #002050;
+    }
+    .remboursement-box {
+        background-color: #e0f7fa;
+        padding: 10px;
+        border-radius: 8px;
+        color: #004d40;
+        font-weight: 600;
+        text-align: center;
+    }
+    .don-box {
+        background-color: #f0f4f8;
+        padding: 12px;
+        border-radius: 8px;
+        color: #1e3a8a;
+        font-weight: 600;
+        text-align: center;
+    }
+    .garant-img {
+        max-width: 100px;
+        max-height: 100px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+    }
+</style>
+
+<h1>Bienvenue, {{ membre.prenom }} !</h1>
+
+<h2>Tontines auxquelles vous avez souscrit :</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Type de Tontine</th>
+            <th>Montant</th>
+            <th>Date de Souscription</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for souscription in souscriptions %}
+        <tr>
+            <td>{{ souscription.tontine.typeTontine }}</td>
+            <td>{{ souscription.tontine.montant }} F</td>
+            <td>{{ souscription.date_souscription }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" style="text-align:center; font-style: italic;">Vous ne faites partie d'aucune tontine pour le moment.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'liste_tontine' %}" class="button">Retour à la liste des tontines</a>
+
+<h2>Vos Prêts</h2>
+{% if prets_avec_remboursement %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Montant</th>
+            <th>Observations</th>
+            <th>Statut</th>
+            <th>Garant</th>
+            <th>CNI du Garant</th>
+            <th>Remboursement</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in prets_avec_remboursement %}
+        <tr>
+            <td>{{ item.pret.idpret }}</td>
+            <td>{{ item.pret.montant }} F</td>
+            <td>{{ item.pret.observations }}</td>
+            <td>{{ item.pret.statut }}</td>
+            <td>{{ item.pret.garant.nom }}</td>
+            <td>
+                {% if item.pret.garant_cni_image %}
+                    <img src="{{ item.pret.garant_cni_image.url }}" alt="CNI" class="garant-img">
+                {% else %}
+                    Non disponible
+                {% endif %}
+            </td>
+            <td>
+                <div class="remboursement-box">
+                    Déjà remboursé : {{ item.total_rembourse }} F<br>
+                    Reste à rembourser : {{ item.reste }} F
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div style="text-align: center;">
+    <a href="{% url 'effectuer_remboursement' %}" class="button" style="background-color:#28a745; margin-top: 20px;">
+        Effectuer un remboursement
+    </a>
+</div>
+{% else %}
+<p style="text-align:center; font-style: italic; margin-top: 20px;">Aucun prêt enregistré pour l'instant.</p>
+{% endif %}
+
+<h2>Vos Dons</h2>
+{% if dons %}
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Détails</th>
+            <th>Montant</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for don in dons %}
+        <tr>
+            <td>{{ don.dateDon }}</td>
+            <td>{{ don.get_typeDon_display }}</td>
+            <td>
+                {% if don.typeDon == "argent" %}
+                    Don en argent
+                {% else %}
+                    {{ don.description }}
+                {% endif %}
+            </td>
+            <td>
+                {% if don.typeDon == "argent" %}
+                    {{ don.montant }} F
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p class="don-box">Total des dons en argent : {{ total_dons_argent }} F</p>
+{% else %}
+<p style="text-align:center; font-style: italic; margin-top: 20px;">Vous n'avez effectué aucun don pour le moment.</p>
+{% endif %}
+
+{% endblock %}

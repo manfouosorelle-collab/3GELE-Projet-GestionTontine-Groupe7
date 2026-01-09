@@ -1,0 +1,72 @@
+{% extends 'admin_dashboard.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Prêts</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h1 class="mb-4 text-center text-primary">Liste des Prêts</h1>
+
+        {% if prets %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover shadow-sm">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom du Membre</th>
+                            <th>Montant</th>
+                            <th>Observations</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pret in prets %}
+                        <tr>
+                            <td>{{ pret.idpret }}</td>
+                            <td>
+                                {% if pret.idmembre %}
+                                    {{ pret.idmembre.nom }} {{ pret.idmembre.prenom }}
+                                {% else %}
+                                    Inconnu
+                                {% endif %}
+                            </td>
+                            <td>{{ pret.montant }} €</td>
+                            <td>{{ pret.observations|default:"Aucune" }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if pret.statut == 'approuvé' %}
+                                        bg-success
+                                    {% elif pret.statut == 'refusé' %}
+                                        bg-danger
+                                    {% else %}
+                                        bg-warning text-dark
+                                    {% endif %}
+                                ">
+                                    {{ pret.statut|capfirst }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">
+                Aucun prêt enregistré pour l'instant.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS (facultatif) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock %}

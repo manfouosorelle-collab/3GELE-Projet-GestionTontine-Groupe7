@@ -1,0 +1,31 @@
+{% extends 'admin_dashboard.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-10 p-8 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
+  <h2 class="text-3xl font-semibold text-gray-800 mb-6 border-b pb-2">
+    Membres inscrits à la tontine : <span class="text-blue-600">{{ tontine.typeTontine }}</span>
+  </h2>
+
+  {% if membres %}
+    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
+      {% for membre in membres %}
+        <li class="bg-white border border-gray-200 rounded-md px-4 py-2 shadow-sm">
+          {{ membre.nom }} {{ membre.prenom }}
+        </li>
+        
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-gray-600 italic text-center">Aucun membre n'a encore souscrit à cette tontine.</p>
+  {% endif %}
+
+  <div class="mt-8 text-center">
+    <form action="{% url 'souscrire_tontine' tontine.idTontines %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-2 rounded-md shadow-md transition">
+        Souscrire à cette tontine
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
